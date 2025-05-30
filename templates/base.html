@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Blog</title>
+    <!-- เพิ่มฟอนต์ Pacifico -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <!-- TailwindCSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white font-sans transition-opacity duration-500 ease-in-out opacity-100 opacity-0" id="page-body">
+
+    <!-- Header -->
+    <header class="bg-black text-white w-full shadow-md">
+        <div class="max-w-screen-xl mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- ซ้าย: โลโก้ -->
+            <h1 class="text-3xl font-bold" style="font-family: 'Pacifico', cursive;">
+                <a href="/" class="text-green-400 hover:text-green-300">My Personal Blog</a>
+            </h1>
+
+            <!-- ขวา: เมนู -->
+            <nav class="flex items-center space-x-6">
+                <a href="https://www.youtube.com/@bunyakorntongraar4276" class="hover:text-pink-400" target="_blank">YouTube</a>
+                <a href="https://www.linkedin.com/in/bunyakorn-tongraar-1a680934a/" class="hover:text-pink-400" target="_blank">Linkedin</a>
+                <a href="https://www.facebook.com/boonyakorn.tongraar.1/?locale=th_TH" class="hover:text-pink-400" target="_blank">Facebook</a>
+                <a href="/works" class="hover:text-pink-400">Thesis</a>
+                <a href="/new" class="bg-pink-400 text-black px-3 py-1 rounded hover:bg-pink-300 text-sm">Comment Post</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-screen-xl mx-auto p-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Contact Button (Bottom Right) -->
+    <button onclick="document.getElementById('contactPopup').classList.remove('hidden')" 
+        class="fixed bottom-6 right-6 bg-pink-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-pink-400 transition">
+        Contact
+    </button>
+
+    <!-- Contact Popup -->
+    <div id="contactPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 transition-opacity duration-500 opacity-0">
+        <div class="bg-white text-black rounded-lg shadow-lg max-w-sm w-full p-6 relative scale-95 transition-transform duration-300">
+            <button onclick="hidePopup()" 
+                class="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl">&times;</button>
+            <h2 class="text-xl font-semibold mb-4 text-pink-500">Contact Info</h2>
+            <p><strong>Email:</strong> bunyakorn7239@gmail.com</p>
+            <p><strong>Phone:</strong> 092-663-7239</p>
+            <p><strong>Instagram:</strong> <a href="https://www.instagram.com/boss_bunyakorn/" class="text-blue-500 hover:underline" target="_blank">boss_bunyakorn</a></p>
+            <p><strong>GitHub:</strong> <a href="https://github.com/bunyakorn7239" class="text-blue-500 hover:underline" target="_blank">bunyakorn7239</a></p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Page transition
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', function (e) {
+                const href = link.getAttribute('href');
+                const isInternal = href.startsWith('/') && !href.startsWith('//');
+                const isNewTab = link.target === '_blank';
+
+                if (isInternal && !isNewTab) {
+                    e.preventDefault();
+                    const pageBody = document.getElementById('page-body');
+                    pageBody.classList.add('opacity-0');
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 500);
+                }
+            });
+        });
+
+        // Smooth show/hide for contact popup
+        function showPopup() {
+            const popup = document.getElementById('contactPopup');
+            popup.classList.remove('hidden');
+            setTimeout(() => {
+                popup.classList.remove('opacity-0');
+                popup.querySelector('div').classList.remove('scale-95');
+            }, 10);
+        }
+
+        function hidePopup() {
+            const popup = document.getElementById('contactPopup');
+            popup.classList.add('opacity-0');
+            popup.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 300);
+        }
+
+        // Override onclick in contact button
+        document.querySelector('button[onclick*="contactPopup"]').onclick = showPopup;
+    </script>
+
+</body>
+</html>

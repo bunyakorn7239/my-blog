@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row gap-6">
+    <!-- ด้านซ้าย: โพสต์ -->
+    <div class="w-full md:w-1/2 space-y-6">
+        {% for post in posts %}
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow hover:shadow-xl transition">
+                <h2 class="text-xl font-semibold text-green-300 mb-2">{{ post.title }}</h2>
+                
+                <p class="text-sm text-gray-300" id="preview-{{ loop.index0 }}">
+                    {{ post.content[:150] }}...
+                    <button onclick="toggleContent({{ loop.index0 }})" class="text-pink-400 hover:underline ml-2">
+                        Read more
+                    </button>
+                </p>
+
+                <p class="text-sm text-gray-300 hidden" id="full-{{ loop.index0 }}">
+                    {{ post.content }}
+                    <button onclick="toggleContent({{ loop.index0 }})" class="text-blue-400 hover:underline ml-2">
+                        Show less
+                    </button>
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- ด้านขวา: รูปภาพ -->
+    <div class="w-full md:w-1/2 flex justify-center items-center min-h-full">
+        <img src="{{ url_for('static', filename='copilot image (thank you).png') }}"
+         alt="Thank You AI Style"
+         class="w-full h-full max-h-[90vh] object-contain rounded-lg shadow-lg" />
+    </div>
+
+
+<!-- JavaScript toggle -->
+<script>
+    function toggleContent(id) {
+        const preview = document.getElementById('preview-' + id);
+        const full = document.getElementById('full-' + id);
+        preview.classList.toggle('hidden');
+        full.classList.toggle('hidden');
+    }
+</script>
+{% endblock %}

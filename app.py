@@ -8,15 +8,12 @@ import csv
 app = Flask(__name__)
 
 # --- 1. การตั้งค่า Session และ Secret Key ---
-# SECRET_KEY เป็นสิ่งจำเป็นสำหรับการใช้ session เพื่อความปลอดภัย
-# ควรตั้งเป็นค่าสุ่มยาวๆ ที่ไม่สามารถเดาได้
 app.config['SECRET_KEY'] = 'your-very-secret-and-random-key'
-
-# ตั้งเวลาหมดอายุของ session (Logout อัตโนมัติ) เป็นเวลา 30 นาที
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 
 # --- 2. ฟังก์ชันจัดการข้อมูลและ Log ---
+
 def load_posts():
     """โหลดข้อมูลโพสต์จากไฟล์ posts.json"""
     if not os.path.exists('posts.json'):
@@ -29,18 +26,30 @@ def save_posts(posts):
     with open('posts.json', 'w', encoding='utf-8') as f:
         json.dump(posts, f, indent=4)
 
-def log_user_activity(username):
-    """บันทึกชื่อผู้ใช้, วันที่, และเวลาที่เข้าสู่ระบบลงในไฟล์ CSV"""
-    file_exists = os.path.isfile('user_log.csv')
-    with open('user_log.csv', 'a', newline='', encoding='utf-8') as f:
+# ***************************************************************
+# *** จุดแก้ไขที่ 1: อัปเดตฟังก์ชัน log_user_activity ***
+# ***************************************************************
+def log_user_activity(username, keyword):
+    """บันทึกชื่อผู้ใช้, keyword, วันที่, และเวลาที่เข้าสู่ระบบลงในไฟล์ CSV"""
+    file_path = 'user_log.csv'
+    file_exists = os.path.isfile(file_path)
+    
+    # กำหนดหัวข้อคอลัมน์ใหม่
+    header = ['username', 'used_for', 'login_datetime']
+    
+    with open(file_path, 'a', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        # ถ้าเป็นไฟล์ใหม่ ให้เขียนหัวข้อคอลัมน์ก่อน
-        if not file_exists:
-            writer.writerow(['username', 'login_datetime'])
+        
+        # ถ้าไฟล์ยังไม่มี หรือไฟล์ว่างเปล่า ให้เขียนหัวข้อคอลัมน์ก่อน
+        if not file_exists or os.path.getsize(file_path) == 0:
+            writer.writerow(header)
+        
+        # เตรียมข้อมูลที่จะบันทึก
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_data = [username, keyword, now]
         
         # บันทึกข้อมูล
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        writer.writerow([username, now])
+        writer.writerow(log_data)
 
 
 # --- 3. Decorator สำหรับตรวจสอบการ Login ---
@@ -57,28 +66,22 @@ def login_required(f):
 
 # --- 4. Routes ของเว็บแอปพลิเคชัน ---
 
-# @app.route('/')
-# def index():
-#     """Route หลักสำหรับตรวจสอบและ Redirect ไปยังหน้า Home หรือ Login"""
-#     if 'username' in session:
-#         return redirect(url_for('home'))
-#     return redirect(url_for('login'))
-
 @app.route('/')
 def index():
-    # ล้าง session ของผู้ใช้ออกทุกครั้งที่เข้ามาที่หน้าแรกสุด
+    """Route หลักสำหรับเคลียร์ Session และบังคับไปหน้า Login"""
     session.pop('username', None)
-    
-    # จากนั้นส่งผู้ใช้ไปที่หน้า Login เสมอ
     return redirect(url_for('login'))
 
 @app.route('/home')
 @login_required
 def home():
-    """หน้าหลักของบล็อก (แสดงรายการโพสต์)"""
+    """หน้าหลักของบล็อก"""
     posts = load_posts()
     return render_template('index.html', posts=posts)
 
+# ***************************************************************
+# *** จุดแก้ไขที่ 2: อัปเดต Route /login ***
+# ***************************************************************
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """หน้าสำหรับเข้าสู่ระบบ"""
@@ -86,14 +89,18 @@ def login():
         return redirect(url_for('home'))
 
     if request.method == 'POST':
-        username = request.form['username']
-        keyword = request.form['keyword']
+        # ใช้ .get() เพื่อความปลอดภัย ป้องกัน error หากไม่มีค่าส่งมา
+        username = request.form.get('username')
+        keyword = request.form.get('keyword')
         
-        # เงื่อนไขการล็อกอิน: แค่กรอกข้อมูลให้ครบทั้ง 2 ช่อง
-        if username.strip() and keyword.strip():
+        # ตรวจสอบว่ามีการกรอก username และเลือก keyword ครบถ้วน
+        if username and username.strip() and keyword:
             session.permanent = True
             session['username'] = username
-            log_user_activity(username)
+            
+            # ส่งค่า username และ keyword ไปยังฟังก์ชันบันทึก log
+            log_user_activity(username, keyword)
+            
             flash(f'ยินดีต้อนรับ, {username}!', 'success')
             return redirect(url_for('home'))
         else:
@@ -121,7 +128,10 @@ def new_post():
     """หน้าสำหรับสร้างโพสต์ใหม่"""
     if request.method == 'POST':
         posts = load_posts()
-        new_post = {'title': request.form['title'], 'content': request.form['content']}
+        new_post = {
+            'title': request.form.get('title'), 
+            'content': request.form.get('content')
+        }
         posts.append(new_post)
         save_posts(posts)
         return redirect(url_for('home'))

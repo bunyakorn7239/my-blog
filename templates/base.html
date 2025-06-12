@@ -13,9 +13,8 @@
     <!-- Header -->
     <header class="bg-black text-white w-full shadow-md">
         <div class="max-w-screen-xl mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- ซ้าย: โลโก้ -->
             <h1 class="text-3xl font-bold" style="font-family: 'Pacifico', cursive;">
-                <a href="/" class="text-green-400 hover:text-green-300">My Personal Blog</a>
+                <a href="{{ url_for('home') }}" class="text-green-400 hover:text-green-300">My Personal Blog</a>
             </h1>
 
             <!-- ขวา: เมนู -->
@@ -23,8 +22,8 @@
                 <a href="https://www.youtube.com/@bunyakorntongraar4276" class="hover:text-pink-400" target="_blank">YouTube</a>
                 <a href="https://www.linkedin.com/in/bunyakorn-tongraar-1a680934a/" class="hover:text-pink-400" target="_blank">Linkedin</a>
                 <a href="https://www.facebook.com/boonyakorn.tongraar.1/?locale=th_TH" class="hover:text-pink-400" target="_blank">Facebook</a>
-                <a href="/works" class="hover:text-pink-400">Thesis</a>
-                <a href="/new" class="bg-pink-400 text-black px-3 py-1 rounded hover:bg-pink-300 text-sm">Comment Post</a>
+                <a href="/works" class="hover:text-pink-400">My works</a>
+                <a href="/new" class="bg-pink-400 text-black px-3 py-1 rounded hover:bg-pink-300 text-sm">Feedback</a>
             </nav>
         </div>
     </header>

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-gray-800 rounded-lg shadow-lg text-center">
+    <h2 class="text-3xl font-bold text-green-300 mb-6 border-b-2 border-green-300 pb-2">My Thesis & Works</h2>
+    
+    <div class="my-10">
+        <p class="text-white text-lg mb-6">
+            คุณสามารถเข้าถึงไฟล์งานทั้งหมดของฉันได้โดยตรงผ่าน Google Drive
+        </p>
+        
+        <a href="https://drive.google.com/drive/folders/1e6tn2g5WabgAKc5FEwauf4J7h5DaWA18?usp=drive_link"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="inline-block bg-pink-500 text-white font-bold text-xl px-10 py-4 rounded-full shadow-lg hover:bg-pink-400 transition-transform transform hover:scale-105">
+            📂 เปิดโฟลเดอร์ผลงาน
+        </a>
+    </div>
+    
+    <p class="text-center text-gray-400 mt-4">
+        การคลิกที่ปุ่มจะเปิดหน้าต่างใหม่เพื่อไปยัง Google Drive
+    </p>
+</div>
+{% endblock %}

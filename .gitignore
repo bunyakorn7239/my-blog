@@ -1,0 +1,7 @@
+# Ignore user log file
+user_log.csv
+
+# Python specific ignores
+__pycache__/
+venv/
+instance/
